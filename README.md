@@ -58,7 +58,7 @@ running notification daemon. (Tested with KDE Plasma 6)
 ### knockknock (experimental)
 
 Displays notifications as an in-Emacs overlay using the
-[knockknock](https://github.com/xenodium/knockknock) package. Useful if you prefer
+[knockknock](https://github.com/konrad1977/knockknock) package. (Requires [PR #4](https://github.com/konrad1977/knockknock/pull/4)) Useful if you prefer
 notifications inside Emacs or are on a system where D-Bus is unavailable.
 
 > **Note:** This backend is experimental. It is included primarily as a working example of
