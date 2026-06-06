@@ -71,6 +71,14 @@ Requires `knockknock` to be installed. Enable it with:
 (setq agent-shell-notifications-provider 'agent-shell-notifications-knockknock)
 ```
 
+### alert.el (experimental)
+
+Uses [alert.el](https://github.com/jwiegley/alert) as a backed to
+display notifications. Alert supports a [range of alert
+backends](https://github.com/jwiegley/alert#builtin-alert-styles)
+including macOS's notifications ((terminal) `notifier` and applescript
+as `osx-notifier`) and Windows' `toast` notifier.
+
 ## Configuration
 
 ### Backend
@@ -166,14 +174,16 @@ backend. Defaults to `identity`.
 
 ### Standard notification plist
 
-| Key | Type | Description |
-|---|---|---|
-| `:title` | string | Notification title |
-| `:body` | string or nil | Notification body text |
-| `:app-icon` | string or nil | Path to icon file |
-| `:timeout` | number | Display duration in seconds (`0` = never expire, `-1` = backend default) |
-| `:actions` | list | Action labels, e.g. `'("default" "Switch to shell")` |
-| `:on-action` | function | Called with `(id key)` when an action is invoked |
+| Key                  | Type          | Description                                                              |
+|----------------------|---------------|--------------------------------------------------------------------------|
+| `:title`             | string        | Notification title                                                       |
+| `:body`              | string or nil | Notification body text                                                   |
+| `:app-icon`          | string or nil | Path to icon file                                                        |
+| `:timeout`           | number        | Display duration in seconds (`0` = never expire, `-1` = backend default) |
+| `:actions`           | list          | Action labels, e.g. `'("default" "Switch to shell")`                     |
+| `:on-action`         | function      | Called with `(id key)` when an action is invoked                         |
+| `:shell-buffer-name` | string        | Name of agent-shell-buffer where the notification originates             |
+
 
 To load your backend, set `agent-shell-notifications-provider` to the feature symbol and
 call `agent-shell-notifications-set-provider`:

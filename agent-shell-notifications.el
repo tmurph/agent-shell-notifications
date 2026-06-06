@@ -41,6 +41,7 @@ After changing this value, call `agent-shell-notifications-set-provider'
 with the new symbol to load the provider and validate the result."
   :type '(choice (const :tag "libnotify (notifications.el)" agent-shell-notifications-libnotify)
                  (const :tag "knockknock (optional dependency)" agent-shell-notifications-knockknock)
+		 (const :tag "alert.el (optional dependency)" agent-shell-notifications-alert)
                  (const :tag "None (configure manually)" nil)
                  (symbol :tag "Custom provider"))
   :group 'agent-shell-notifications)
@@ -374,6 +375,7 @@ meta properties: :app-icon, :timeout, :actions, and :on-action."
                                  (agent-shell-notifications--resolve-timeout
                                   agent-shell-notifications-timeout type event))
                 :actions '("default" "Switch to shell")
+		:shell-buffer-name (buffer-name shell-buffer)
                 :on-action (lambda (_id _key)
                              (agent-shell-notifications--switch-to-shell shell-buffer)))))
 
