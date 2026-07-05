@@ -72,13 +72,17 @@ Renames :body to :message, :app-icon to :icon-file, maps
   "Close the current knockknock notification."
   (knockknock-close))
 
-(setq agent-shell-notifications-transform-timeout-function #'identity)
-(setq agent-shell-notifications-transform-function
-      #'agent-shell-notifications--transform-knockknock)
-(setq agent-shell-notifications-send-function
-      #'agent-shell-notifications--send-knockknock)
-(setq agent-shell-notifications-close-function
-      #'agent-shell-notifications--close-knockknock)
+(defun agent-shell-notifications-knockknock-setup ()
+  "Configure agent-shell-notifications to use the knockknock backend."
+  (setq agent-shell-notifications-transform-timeout-function #'identity)
+  (setq agent-shell-notifications-transform-function
+        #'agent-shell-notifications--transform-knockknock)
+  (setq agent-shell-notifications-send-function
+        #'agent-shell-notifications--send-knockknock)
+  (setq agent-shell-notifications-close-function
+        #'agent-shell-notifications--close-knockknock))
+
+(agent-shell-notifications-knockknock-setup)
 
 (provide 'agent-shell-notifications-knockknock)
 

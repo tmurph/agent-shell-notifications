@@ -23,13 +23,17 @@
   "Close the notification with ID via `notifications-close-notification'."
   (notifications-close-notification id))
 
-(setq agent-shell-notifications-transform-timeout-function
-      (lambda (secs) (* 1000 secs)))
-(setq agent-shell-notifications-transform-function #'identity)
-(setq agent-shell-notifications-send-function
-      #'agent-shell-notifications--send-libnotify)
-(setq agent-shell-notifications-close-function
-      #'agent-shell-notifications--close-libnotify)
+(defun agent-shell-notifications-libnotify-setup ()
+  "Configure agent-shell-notifications to use the libnotify backend."
+  (setq agent-shell-notifications-transform-timeout-function
+        (lambda (secs) (* 1000 secs)))
+  (setq agent-shell-notifications-transform-function #'identity)
+  (setq agent-shell-notifications-send-function
+        #'agent-shell-notifications--send-libnotify)
+  (setq agent-shell-notifications-close-function
+        #'agent-shell-notifications--close-libnotify))
+
+(agent-shell-notifications-libnotify-setup)
 
 (provide 'agent-shell-notifications-libnotify)
 

@@ -32,6 +32,12 @@
   "Notifications for agent-shell."
   :group 'agent-shell)
 
+(defun agent-shell-notifications--set-provider-custom (symbol value)
+  "Set SYMBOL to VALUE and apply the provider after package load."
+  (set-default-toplevel-value symbol value)
+  (when (featurep 'agent-shell-notifications)
+    (agent-shell-notifications-set-provider value)))
+
 (defcustom agent-shell-notifications-provider 'agent-shell-notifications-libnotify
   "Notification provider to load.
 A symbol naming the feature to require, which must set
@@ -39,12 +45,15 @@ A symbol naming the feature to require, which must set
 `agent-shell-notifications-close-function'.
 Set to nil to configure those functions manually.
 
-After changing this value, call `agent-shell-notifications-set-provider'
-with the new symbol to load the provider and validate the result."
+Changing this value through Customize or `customize-set-variable' after
+package load also applies the new provider.
+Plain `setq' only changes the variable; call
+`agent-shell-notifications-set-provider' to switch providers explicitly."
   :type '(choice (const :tag "libnotify (notifications.el)" agent-shell-notifications-libnotify)
                  (const :tag "knockknock (optional dependency)" agent-shell-notifications-knockknock)
                  (const :tag "None (configure manually)" nil)
                  (symbol :tag "Custom provider"))
+  :set #'agent-shell-notifications--set-provider-custom
   :group 'agent-shell-notifications)
 
 (defcustom agent-shell-notifications-timeout 0
@@ -617,6 +626,17 @@ close notifications when the viewport view window is selected or a reply is sent
       (advice-remove #'agent-shell-viewport-reply
                      #'agent-shell-notifications--on-viewport-activity))))
 
+(defun agent-shell-notifications--reset-provider-functions ()
+  "Reset provider-owned functions before loading a new provider."
+  (setq agent-shell-notifications-transform-timeout-function #'identity)
+  (setq agent-shell-notifications-transform-function #'identity)
+  (setq agent-shell-notifications-send-function nil)
+  (setq agent-shell-notifications-close-function nil))
+
+(defun agent-shell-notifications--provider-setup-function (provider)
+  "Return setup function symbol for PROVIDER."
+  (intern (format "%s-setup" provider)))
+
 ;;;###autoload
 (defun agent-shell-notifications-set-provider (provider)
   "Load PROVIDER and validate that it sets the required functions.
@@ -626,8 +646,14 @@ must set `agent-shell-notifications-send-function' and
 skips loading and validation (the functions must be set manually).
 Interactively, reads a provider symbol from the minibuffer."
   (interactive "SProvider symbol: ")
+  (setq agent-shell-notifications-provider provider)
   (when provider
-    (require provider))
+    (agent-shell-notifications--reset-provider-functions)
+    (require provider)
+    (let ((setup-function
+           (agent-shell-notifications--provider-setup-function provider)))
+      (when (fboundp setup-function)
+        (funcall setup-function))))
   (unless agent-shell-notifications-send-function
     (error "agent-shell-notifications: `agent-shell-notifications-send-function' is nil; \
 the provider must set it"))

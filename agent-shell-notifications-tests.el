@@ -713,6 +713,73 @@
         (agent-shell-notifications-close-function nil))
     (should-error (agent-shell-notifications-set-provider nil))))
 
+(ert-deftest asn-test-set-provider/custom-set-variable-reloads-provider ()
+  "Changing provider via Custom applies the active provider functions."
+  (let ((original-provider agent-shell-notifications-provider)
+        (original-transform-timeout-function
+         agent-shell-notifications-transform-timeout-function)
+        (original-transform-function agent-shell-notifications-transform-function)
+        (original-send-function agent-shell-notifications-send-function)
+        (original-close-function agent-shell-notifications-close-function))
+    (unwind-protect
+        (progn
+          (setq agent-shell-notifications-transform-timeout-function
+                (lambda (secs) (* secs 2)))
+          (setq agent-shell-notifications-transform-function
+                (lambda (plist) (plist-put plist :old-provider t)))
+          (setq agent-shell-notifications-send-function #'asn-test--send)
+          (setq agent-shell-notifications-close-function #'asn-test--close)
+          (customize-set-variable
+           'agent-shell-notifications-provider
+           'agent-shell-notifications-libnotify)
+          (should (eq agent-shell-notifications-send-function
+                      #'agent-shell-notifications--send-libnotify))
+          (should (eq agent-shell-notifications-close-function
+                      #'agent-shell-notifications--close-libnotify))
+          (should (= (funcall agent-shell-notifications-transform-timeout-function 1)
+                     1000))
+          (should-not
+           (plist-get (funcall agent-shell-notifications-transform-function nil)
+                      :old-provider)))
+      (setq agent-shell-notifications-provider original-provider)
+      (setq agent-shell-notifications-transform-timeout-function
+            original-transform-timeout-function)
+      (setq agent-shell-notifications-transform-function original-transform-function)
+      (setq agent-shell-notifications-send-function original-send-function)
+      (setq agent-shell-notifications-close-function original-close-function))))
+
+(ert-deftest asn-test-set-provider/reloads-built-in-providers ()
+  "set-provider reapplies already-loaded built-in provider setup functions."
+  (let ((original-provider agent-shell-notifications-provider)
+        (original-transform-timeout-function
+         agent-shell-notifications-transform-timeout-function)
+        (original-transform-function agent-shell-notifications-transform-function)
+        (original-send-function agent-shell-notifications-send-function)
+        (original-close-function agent-shell-notifications-close-function))
+    (unwind-protect
+        (progn
+          (agent-shell-notifications-set-provider
+           'agent-shell-notifications-knockknock)
+          (should (eq agent-shell-notifications-send-function
+                      #'agent-shell-notifications--send-knockknock))
+          (should (eq agent-shell-notifications-close-function
+                      #'agent-shell-notifications--close-knockknock))
+          (should (eq agent-shell-notifications-transform-function
+                      #'agent-shell-notifications--transform-knockknock))
+
+          (agent-shell-notifications-set-provider
+           'agent-shell-notifications-libnotify)
+          (should (eq agent-shell-notifications-send-function
+                      #'agent-shell-notifications--send-libnotify))
+          (should (eq agent-shell-notifications-close-function
+                      #'agent-shell-notifications--close-libnotify)))
+      (setq agent-shell-notifications-provider original-provider)
+      (setq agent-shell-notifications-transform-timeout-function
+            original-transform-timeout-function)
+      (setq agent-shell-notifications-transform-function original-transform-function)
+      (setq agent-shell-notifications-send-function original-send-function)
+      (setq agent-shell-notifications-close-function original-close-function))))
+
 (provide 'agent-shell-notifications-tests)
 
 ;;; agent-shell-notifications-tests.el ends here

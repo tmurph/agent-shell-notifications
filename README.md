@@ -30,6 +30,10 @@ Desktop notifications for [agent-shell](https://github.com/xenodium/agent-shell)
   ;; (agent-shell-viewport-edit-mode . agent-shell-notifications-viewport-edit-mode)
   ;; (agent-shell-viewport-view-mode . agent-shell-notifications-viewport-view-mode)
 
+  :custom
+  ;; Use a different backend when needed:
+  ;; (agent-shell-notifications-provider 'agent-shell-notifications-knockknock)
+
   :config
   ;; Notification display timeout in seconds (0 = never expire (the default), -1 = backend default)
   ;; (setq agent-shell-notifications-timeout 5)
@@ -43,8 +47,6 @@ Desktop notifications for [agent-shell](https://github.com/xenodium/agent-shell)
   ;;             (let ((hour (decoded-time-hour (decode-time))))
   ;;               (and (>= hour 9) (< hour 17)))))
 
-  ;; Use the knockknock backend instead of the default libnotify
-  ;; (setq agent-shell-notifications-provider 'agent-shell-notifications-knockknock)
   )
 ```
 
@@ -68,7 +70,9 @@ notifications inside Emacs or are on a system where D-Bus is unavailable.
 Requires `knockknock` to be installed. Enable it with:
 
 ```elisp
-(setq agent-shell-notifications-provider 'agent-shell-notifications-knockknock)
+(customize-set-variable
+ 'agent-shell-notifications-provider
+ 'agent-shell-notifications-knockknock)
 ```
 
 ## Configuration
@@ -134,18 +138,24 @@ viewport) and selects its window. Override this to control how navigation works.
 
 ## Custom backends
 
-A backend is an Elisp file that sets variables and provides a feature:
+A backend is an Elisp file that defines a setup function and provides a feature:
 
 ```elisp
-(setq agent-shell-notifications-send-function   #'my-backend--send)
-(setq agent-shell-notifications-close-function  #'my-backend--close)
-;; Optional: convert the timeout unit for your backend
-(setq agent-shell-notifications-transform-timeout-function #'my-backend--transform-timeout)
-;; Optional: remap the standard plist keys for your backend
-(setq agent-shell-notifications-transform-function #'my-backend--transform)
+(defun agent-shell-notifications-my-backend-setup ()
+  (setq agent-shell-notifications-send-function   #'my-backend--send)
+  (setq agent-shell-notifications-close-function  #'my-backend--close)
+  ;; Optional: convert the timeout unit for your backend
+  (setq agent-shell-notifications-transform-timeout-function #'my-backend--transform-timeout)
+  ;; Optional: remap the standard plist keys for your backend
+  (setq agent-shell-notifications-transform-function #'my-backend--transform))
+
+(agent-shell-notifications-my-backend-setup)
 
 (provide 'agent-shell-notifications-my-backend)
 ```
+
+The setup function is called again when switching back to a provider that has
+already been loaded.
 
 **`agent-shell-notifications-send-function`** — called with a notification plist, should
 display the notification and return an ID (or `nil` if your backend has no concept of IDs).
@@ -175,12 +185,13 @@ backend. Defaults to `identity`.
 | `:actions` | list | Action labels, e.g. `'("default" "Switch to shell")` |
 | `:on-action` | function | Called with `(id key)` when an action is invoked |
 
-To load your backend, set `agent-shell-notifications-provider` to the feature symbol and
-call `agent-shell-notifications-set-provider`:
+To load your backend, customize `agent-shell-notifications-provider` to the
+feature symbol:
 
 ```elisp
-(setq agent-shell-notifications-provider 'agent-shell-notifications-my-backend)
-(agent-shell-notifications-set-provider agent-shell-notifications-provider)
+(customize-set-variable
+ 'agent-shell-notifications-provider
+ 'agent-shell-notifications-my-backend)
 ```
 
 ## TODO
