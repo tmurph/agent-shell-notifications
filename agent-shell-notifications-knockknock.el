@@ -3,7 +3,7 @@
 ;; Copyright (C) 2026 Zachary Hanham
 ;; Copyright (C) 2026 Alvaro Ramirez
 
-;; Package-Requires: ((emacs "29.1") (agent-shell-notifications "0.1") (knockknock "0.3"))
+;; Package-Requires: ((emacs "29.1") (knockknock "0.3"))
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
