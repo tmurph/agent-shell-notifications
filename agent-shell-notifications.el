@@ -1,4 +1,4 @@
-;;; agent-shell-notifications.el --- Libnotify notifications for agent-shell -*- lexical-binding: t; -*-
+;;; agent-shell-notifications.el --- Desktop notifications for agent-shell -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 Zachary Hanham
 ;; Copyright (C) 2026 Alvaro Ramirez
@@ -531,8 +531,8 @@ If SHELL-BUFFER is nil, use the current buffer."
 
 ;;;###autoload
 (define-minor-mode agent-shell-notifications-mode
-  "Toggle libnotify notifications for the current agent-shell buffer."
-  :lighter " libnotify"
+  "Toggle desktop notifications for the current agent-shell buffer."
+  :lighter " Notify"
   (if agent-shell-notifications-mode
       (progn
         (add-hook 'kill-buffer-hook #'agent-shell-notifications--on-buffer-kill nil t)
