@@ -50,6 +50,7 @@ package load also applies the new provider.
 Plain `setq' only changes the variable; call
 `agent-shell-notifications-set-provider' to switch providers explicitly."
   :type '(choice (const :tag "libnotify (notifications.el)" agent-shell-notifications-libnotify)
+                 (const :tag "osascript (macOS)" agent-shell-notifications-osascript)
                  (const :tag "knockknock (optional dependency)" agent-shell-notifications-knockknock)
                  (const :tag "None (configure manually)" nil)
                  (symbol :tag "Custom provider"))

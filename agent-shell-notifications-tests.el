@@ -759,6 +759,13 @@
     (unwind-protect
         (progn
           (agent-shell-notifications-set-provider
+           'agent-shell-notifications-osascript)
+          (should (eq agent-shell-notifications-send-function
+                      #'agent-shell-notifications--send-osascript))
+          (should (eq agent-shell-notifications-close-function
+                      #'agent-shell-notifications--close-osascript))
+
+          (agent-shell-notifications-set-provider
            'agent-shell-notifications-knockknock)
           (should (eq agent-shell-notifications-send-function
                       #'agent-shell-notifications--send-knockknock))

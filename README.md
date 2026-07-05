@@ -57,6 +57,34 @@ Desktop notifications for [agent-shell](https://github.com/xenodium/agent-shell)
 Uses Emacs' built-in [`notifications.el`](https://www.gnu.org/software/emacs/manual/html_node/elisp/Desktop-Notifications.html) via D-Bus. Works out of the box on Linux with a
 running notification daemon. (Tested with KDE Plasma 6)
 
+### osascript (macOS)
+
+Uses the macOS AppleScript `display notification` command via `osascript`.
+No external dependencies. Supports `:title` and `:body`; `:app-icon`,
+`:timeout`, `:actions`, and `:on-action` are ignored because macOS does not
+expose them through this interface. Notifications cannot be dismissed
+programmatically, so they remain in Notification Center until cleared by the
+user or the system.
+
+Enable it with:
+
+```elisp
+(use-package agent-shell-notifications
+  :custom
+  (agent-shell-notifications-provider 'agent-shell-notifications-osascript))
+```
+
+You can also change the provider after the package has loaded:
+
+```elisp
+(customize-set-variable
+ 'agent-shell-notifications-provider
+ 'agent-shell-notifications-osascript)
+
+;; or, for an explicit runtime switch:
+(agent-shell-notifications-set-provider 'agent-shell-notifications-osascript)
+```
+
 ### knockknock (experimental)
 
 Displays notifications as an in-Emacs overlay using the
@@ -196,7 +224,6 @@ feature symbol:
 
 ## TODO
 
-- [ ] macOS backend — could be implemented using `terminal-notifier` or `osascript`
 - [ ] Windows backend — could be implemented using `toast` or PowerShell
 
 Contributions for either are welcome.
