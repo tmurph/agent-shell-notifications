@@ -3,8 +3,6 @@
 ;; Copyright (C) 2026 Zachary Hanham
 ;; Copyright (C) 2026 Alvaro Ramirez
 
-;; Package-Requires: ((emacs "29.1") (knockknock "0.3"))
-
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 3, or (at your option)
@@ -21,8 +19,6 @@
 ;; https://github.com/xenodium/agent-shell-knockknock
 
 ;;; Code:
-
-(require 'knockknock)
 
 (defvar agent-shell-notifications--knockknock-ret-timer nil
   "Timer controlling the transient RET binding for knockknock.")
@@ -73,7 +69,12 @@ Renames :body to :message, :app-icon to :icon-file, maps
   (knockknock-close))
 
 (defun agent-shell-notifications-knockknock-setup ()
-  "Configure agent-shell-notifications to use the knockknock backend."
+  "Configure agent-shell-notifications to use the knockknock backend.
+This backend requires the optional `knockknock' package to be
+installed separately.  See URL
+`https://github.com/konrad1977/knockknock'."
+  (unless (require 'knockknock nil t)
+    (error "The knockknock notification provider requires the `knockknock' package; install it from https://github.com/konrad1977/knockknock"))
   (setq agent-shell-notifications-transform-timeout-function #'identity)
   (setq agent-shell-notifications-transform-function
         #'agent-shell-notifications--transform-knockknock)
